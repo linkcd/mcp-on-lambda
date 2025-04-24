@@ -41,12 +41,12 @@ export class AWSIAMTransport extends StreamableHTTPClientTransport {
         // Sign the request
         const signedRequest = await this.signer.sign(httpRequest);
 
-        console.log("Signed Request:", {
-             method: signedRequest.method,
-             headers: signedRequest.headers,
-             body: signedRequest.body,
-             url: `${httpRequest.protocol}//${httpRequest.hostname}${httpRequest.path}`,
-         });
+        // console.log("Signed Request:", {
+        //      method: signedRequest.method,
+        //      headers: signedRequest.headers,
+        //      body: signedRequest.body,
+        //      url: `${httpRequest.protocol}//${httpRequest.hostname}${httpRequest.path}`,
+        //  });
 
         // Convert signed request to fetch-compatible format
         const signedHeaders: HeadersInit = {};
@@ -60,7 +60,7 @@ export class AWSIAMTransport extends StreamableHTTPClientTransport {
             body: signedRequest.body as BodyInit,
         });
 
-        console.log("Response:", response);
+        // console.log("Response:", response);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);

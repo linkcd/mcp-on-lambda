@@ -1,7 +1,5 @@
-# Mcp on lambda
+# Streamable MCP Demo on AWS Lambda with IAM Protected Lambda URL
+This repo is mainly based on the article https://community.aws/content/2vzj07Wyk6Lw281Tvs1Lw7kJJNW/building-scalable-mcp-servers-on-aws-lambda-a-practical-guide with following improvement:
 
-Updated version based on https://community.aws/content/2vzj07Wyk6Lw281Tvs1Lw7kJJNW/building-scalable-mcp-servers-on-aws-lambda-a-practical-guide
-
-What is new in this repo:
-1. The Lambda function URL is protected by AWS IAM 
-2. The client will sign the request to Lambda function URL based on current AWS credential 
+1. The SAM deployment provisions the Lambda function URL that is protected by AWS IAM. 
+2. The MCP client can use the new [**AWSIAMTransport** class](./mcp-function/src/transport/AWSIAMTransport.ts) to call the protected Lambda function URL. This class extends the default MCP typescript **StreamableHTTPClientTransport** by automatically sign the HTTP request with [AWS Signature Version 4 for API requests](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv.html). (by default use the local AWS credential, but you can use any AWS credential/role)
