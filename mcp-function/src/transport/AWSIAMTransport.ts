@@ -1,17 +1,18 @@
-import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+import { StreamableHTTPClientTransport, StreamableHTTPClientTransportOptions } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { defaultProvider } from "@aws-sdk/credential-provider-node";
 import { SignatureV4 } from "@aws-sdk/signature-v4";
 import { HttpRequest } from "@aws-sdk/protocol-http";
 import { Sha256 } from "@aws-crypto/sha256-js";
 import { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
 import { Url } from "url";
+import { log } from "console";
 
 export class AWSIAMTransport extends StreamableHTTPClientTransport {
     private serverUrl: URL;
     private signer: SignatureV4;
 
-    constructor(serverUrl: URL) {
-        super(serverUrl);
+    constructor(serverUrl: URL, opts?: StreamableHTTPClientTransportOptions) {
+        super(serverUrl, opts);
         this.serverUrl = serverUrl;
         this.signer = new SignatureV4({
             service: "lambda",
@@ -40,6 +41,13 @@ export class AWSIAMTransport extends StreamableHTTPClientTransport {
         // Sign the request
         const signedRequest = await this.signer.sign(httpRequest);
 
+        console.log("Signed Request:", {
+             method: signedRequest.method,
+             headers: signedRequest.headers,
+             body: signedRequest.body,
+             url: `${httpRequest.protocol}//${httpRequest.hostname}${httpRequest.path}`,
+         });
+
         // Convert signed request to fetch-compatible format
         const signedHeaders: HeadersInit = {};
         for (const [key, value] of Object.entries(signedRequest.headers)) {
@@ -51,6 +59,8 @@ export class AWSIAMTransport extends StreamableHTTPClientTransport {
             headers: signedHeaders,
             body: signedRequest.body as BodyInit,
         });
+
+        console.log("Response:", response);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
